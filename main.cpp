@@ -5,7 +5,6 @@
 http://sourceforge.net/projects/boost/files/boost/1.57.0/ - тут скачать (zip файл)
 !!! Как установить BOOST:
 записать в PATH путь к MinGW\bin
-В линкере добавить libprotobuf.lib
 Зайти в директории буста tools\build\v2
 выполнить 
 bootstrap mingw
@@ -20,7 +19,7 @@ make install
 
 зайти в папку с исходниками, теперь proto файл можно компилировать командой protoc:
 protoc example.proto
-На выходе получается два файла: example.pb.h и example.pb.cc, в main.cpp делаем инклуд на .h файл
+На выходу получается два файла: example.pb.h и example.pb.cc, в main.cpp делаем инклуд на .h файл
 
 !!! Команда для компиляции (из MSYS):
 g++ main.cpp pbfile.pb.cc -std=c++11 -IC:/MinGW/msys/1.0/home/boost_1_57_0/ -LC:/MinGW/msys/1.0/home/boost_1_57_0/stage/lib -lboost_filesystem -lboost_system -lprotobuf
