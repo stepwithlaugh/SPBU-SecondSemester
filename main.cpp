@@ -88,7 +88,7 @@ void get_dir_list(fs::directory_iterator iterator, std::vector<Fileinfo> * vec_f
 		else //а если нет, то записываем в структуру имя, размер, хеш, и флажок (понадобится чуть позже, когда будем искать изменения в файлах)
 		{
 			finfo.path = iterator->path().string();
-			std::replace(finfo.path.begin(), finfo.path.end(), '\\', '/');
+			std::replace(finfo.path.begin(), finfo.path.end(), '\\', '/'); //исправляем косяк с \ перед файлом в пути, так работает filesystem :-(
 			finfo.size = fs::file_size(iterator->path());
 			finfo.hash = "NOT YET";
 			finfo.flag = 'R';
