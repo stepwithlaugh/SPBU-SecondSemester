@@ -51,7 +51,7 @@ struct Fileinfo {
 void savepbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
 	nsofdir::ArrFilep flist;
 	nsofdir::Filep * file_entry;
-	std::ofstream output("filelist.pb", std::ofstream::binary);
+	std::ofstream output(filename, std::ofstream::binary);
 	for (Fileinfo it : vec_finfo) {  //Запись, просто по сделанным методам протобафа
 		file_entry = flist.add_filep();
 		file_entry->set_filepath(it.path);
@@ -117,7 +117,7 @@ int main() {
 			element.flag << std::endl;
 	}
 	*/
-	savepbuf("example.xml", vec_finfo);  //сохраняем полученное в хмл файле с именем example.xml, создастся он в папке где находится main.cpp
+	savepbuf("filelist.pb", vec_finfo);  //сохраняем полученное в хмл файле с именем example.xml, создастся он в папке где находится main.cpp
 	//loadpbuf("example.xml", vec_finfo_old);  //загрузка файла
 	std::cin.clear();
 	fflush(stdin);
