@@ -1,0 +1,11 @@
+package nsofdir;
+
+message Filep {
+  required string filepath = 1;
+  required int32 size = 2;
+  required string mdsixhash = 3;
+}
+
+message ArrFilep {
+    repeated Filep filep = 1;
+}
