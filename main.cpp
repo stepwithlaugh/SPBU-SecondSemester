@@ -22,7 +22,7 @@ make install
 protoc example.proto
 На выходу получается два файла: example.pb.h и example.pb.cc, в main.cpp делаем инклуд на .h файл
 
-!!!Команда для компиляции (из MSYS):
+!!! Команда для компиляции (из MSYS):
 g++ main.cpp pbfile.pb.cc -std=c++11 -IC:/MinGW/msys/1.0/home/boost_1_57_0/ -LC:/MinGW/msys/1.0/home/boost_1_57_0/stage/lib -lboost_filesystem -lboost_system -lprotobuf
 
 Для работы не из msys'a надо найти следующие dll в директррии mingw и сложить их в папку с exe файлом:
@@ -35,7 +35,6 @@ libstdc++-6.dll
 #include <fstream>  //Чтение и запись
 #include <string>
 #include <boost/filesystem.hpp>  //BOOST::FILESYSTEM с помощью которого считываем директорию
-#include <boost/foreach.hpp>
 #include "pbfile.pb.h" //файл, который сделал protoc
 
 namespace fs = boost::filesystem;
