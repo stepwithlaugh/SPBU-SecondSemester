@@ -1,46 +1,46 @@
-//Dan Krupsky, 108
+п»ї//Dan Krupsky, 108
 
 /*
-Всё компилим через MinGW
-http://sourceforge.net/projects/boost/files/boost/1.57.0/ - тут скачать (zip файл)
-!!! Как установить BOOST:
-записать в PATH путь к MinGW\bin
-Зайти в директории буста tools\build\v2
-выполнить
+Р’СЃС‘ РєРѕРјРїРёР»РёРј С‡РµСЂРµР· MinGW
+http://sourceforge.net/projects/boost/files/boost/1.57.0/ - С‚СѓС‚ СЃРєР°С‡Р°С‚СЊ (zip С„Р°Р№Р»)
+!!! РљР°Рє СѓСЃС‚Р°РЅРѕРІРёС‚СЊ BOOST:
+Р·Р°РїРёСЃР°С‚СЊ РІ PATH РїСѓС‚СЊ Рє MinGW\bin
+Р—Р°Р№С‚Рё РІ РґРёСЂРµРєС‚РѕСЂРёРё Р±СѓСЃС‚Р° tools\build\v2
+РІС‹РїРѕР»РЅРёС‚СЊ
 bootstrap mingw
 tools\build\v2\b2 toolset=gcc --build-type=complete stage --with-filesystem
-Библиотеки будут в директория буста  \ stage\lib
-Переименовать соответствующие .a файлы (нам нужны filesystem и system) соответсвенно в libboost_filesystem.a и libboost_system.a
-!!! Как установить протобаф:
-распаковать протобаф в home директории msys'a в mingw, зайти в эту директорию
+Р‘РёР±Р»РёРѕС‚РµРєРё Р±СѓРґСѓС‚ РІ РґРёСЂРµРєС‚РѕСЂРёСЏ Р±СѓСЃС‚Р°  \ stage\lib
+РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёРµ .a С„Р°Р№Р»С‹ (РЅР°Рј РЅСѓР¶РЅС‹ filesystem Рё system) СЃРѕРѕС‚РІРµС‚СЃРІРµРЅРЅРѕ РІ libboost_filesystem.a Рё libboost_system.a
+!!! РљР°Рє СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РїСЂРѕС‚РѕР±Р°С„:
+СЂР°СЃРїР°РєРѕРІР°С‚СЊ РїСЂРѕС‚РѕР±Р°С„ РІ home РґРёСЂРµРєС‚РѕСЂРёРё msys'a РІ mingw, Р·Р°Р№С‚Рё РІ СЌС‚Сѓ РґРёСЂРµРєС‚РѕСЂРёСЋ
 ./configure --prefix=`cd C:/MinGW; pwd -W`
 make
 make install
 
-зайти в папку с исходниками, теперь proto файл можно компилировать командой protoc:
+Р·Р°Р№С‚Рё РІ РїР°РїРєСѓ СЃ РёСЃС…РѕРґРЅРёРєР°РјРё, С‚РµРїРµСЂСЊ proto С„Р°Р№Р» РјРѕР¶РЅРѕ РєРѕРјРїРёР»РёСЂРѕРІР°С‚СЊ РєРѕРјР°РЅРґРѕР№ protoc:
 protoc example.proto
-На выходу получается два файла: example.pb.h и example.pb.cc, в main.cpp делаем инклуд на .h файл
+РќР° РІС‹С…РѕРґСѓ РїРѕР»СѓС‡Р°РµС‚СЃСЏ РґРІР° С„Р°Р№Р»Р°: example.pb.h Рё example.pb.cc, РІ main.cpp РґРµР»Р°РµРј РёРЅРєР»СѓРґ РЅР° .h С„Р°Р№Р»
 
-!!! Команда для компиляции (из MSYS):
+!!! РљРѕРјР°РЅРґР° РґР»СЏ РєРѕРјРїРёР»СЏС†РёРё (РёР· MSYS):
 g++ main.cpp pbfile.pb.cc -std=c++11 -IC:/MinGW/msys/1.0/home/boost_1_57_0/ -LC:/MinGW/msys/1.0/home/boost_1_57_0/stage/lib -lboost_filesystem -lboost_system -lprotobuf
 
-Для работы не из msys'a надо найти следующие dll в директррии mingw и сложить их в папку с exe файлом:
+Р”Р»СЏ СЂР°Р±РѕС‚С‹ РЅРµ РёР· msys'a РЅР°РґРѕ РЅР°Р№С‚Рё СЃР»РµРґСѓСЋС‰РёРµ dll РІ РґРёСЂРµРєС‚СЂСЂРёРё mingw Рё СЃР»РѕР¶РёС‚СЊ РёС… РІ РїР°РїРєСѓ СЃ exe С„Р°Р№Р»РѕРј:
 libgcc_s_dw2-1.dll
 libprotobuf-9.dll
 libstdc++-6.dll
 */
 
 #include <iostream>
-#include <fstream>  //Чтение и запись
+#include <fstream>  //Р§С‚РµРЅРёРµ Рё Р·Р°РїРёСЃСЊ
 #include <string>
-#include <boost/filesystem.hpp>  //BOOST::FILESYSTEM с помощью которого считываем директорию
-#include "pbfile.pb.h" //файл, который сделал protoc
+#include <boost/filesystem.hpp>  //BOOST::FILESYSTEM СЃ РїРѕРјРѕС‰СЊСЋ РєРѕС‚РѕСЂРѕРіРѕ СЃС‡РёС‚С‹РІР°РµРј РґРёСЂРµРєС‚РѕСЂРёСЋ
+#include "pbfile.pb.h" //С„Р°Р№Р», РєРѕС‚РѕСЂС‹Р№ СЃРґРµР»Р°Р» protoc
 #include "md6/md6.h"
 
 namespace fs = boost::filesystem;
 std::string test;
 
-//Данные будем записывать в структуру, а структуру копировать в вектор
+//Р”Р°РЅРЅС‹Рµ Р±СѓРґРµРј Р·Р°РїРёСЃС‹РІР°С‚СЊ РІ СЃС‚СЂСѓРєС‚СѓСЂСѓ, Р° СЃС‚СЂСѓРєС‚СѓСЂСѓ РєРѕРїРёСЂРѕРІР°С‚СЊ РІ РІРµРєС‚РѕСЂ
 struct Fileinfo {
 	std::string path;
 	std::string hash;
@@ -48,52 +48,52 @@ struct Fileinfo {
 	std::string flag;
 };
 
-//Записываем через протобаф. Filelist - внешняя структура, в которую кладем элементы Filep
+//Р—Р°РїРёСЃС‹РІР°РµРј С‡РµСЂРµР· РїСЂРѕС‚РѕР±Р°С„. Filelist - РІРЅРµС€РЅСЏСЏ СЃС‚СЂСѓРєС‚СѓСЂР°, РІ РєРѕС‚РѕСЂСѓСЋ РєР»Р°РґРµРј СЌР»РµРјРµРЅС‚С‹ Filep
 void savepbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
 	nsofdir::ArrFilep flist;
 	nsofdir::Filep * file_entry;
 	std::ofstream output(filename, std::ofstream::binary);
 	for (Fileinfo it : vec_finfo) {
-		//Запись, просто по сделанным методам протобафа
+		//Р—Р°РїРёСЃСЊ, РїСЂРѕСЃС‚Рѕ РїРѕ СЃРґРµР»Р°РЅРЅС‹Рј РјРµС‚РѕРґР°Рј РїСЂРѕС‚РѕР±Р°С„Р°
 		file_entry = flist.add_filep();
 		file_entry->set_filepath(it.path);
 		file_entry->set_size(it.size);
-		file_entry->set_mdsixhash(it.hash); // добавить позже
+		file_entry->set_mdsixhash(it.hash); // РґРѕР±Р°РІРёС‚СЊ РїРѕР·Р¶Рµ
 
 	}
-	//Вывод файла
+	//Р’С‹РІРѕРґ С„Р°Р№Р»Р°
 	flist.PrintDebugString();
-	//Записываем в output файл
+	//Р—Р°РїРёСЃС‹РІР°РµРј РІ output С„Р°Р№Р»
 	flist.SerializeToOstream(&output);
 	output.close();
 }
 
-//Загрузка записанного файла (записывает в файл, но пока не засовывает в вектор - доделать позже
+//Р—Р°РіСЂСѓР·РєР° Р·Р°РїРёСЃР°РЅРЅРѕРіРѕ С„Р°Р№Р»Р° (Р·Р°РїРёСЃС‹РІР°РµС‚ РІ С„Р°Р№Р», РЅРѕ РїРѕРєР° РЅРµ Р·Р°СЃРѕРІС‹РІР°РµС‚ РІ РІРµРєС‚РѕСЂ - РґРѕРґРµР»Р°С‚СЊ РїРѕР·Р¶Рµ
 void loadpbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
-	nsofdir::ArrFilep flist;  //Filelist, в который считаем файл
+	nsofdir::ArrFilep flist;  //Filelist, РІ РєРѕС‚РѕСЂС‹Р№ СЃС‡РёС‚Р°РµРј С„Р°Р№Р»
 	nsofdir::Filep * file_entry;
-	std::ifstream input("filelist.pb", std::ofstream::binary); // Открываем наш записанный файл
-	flist.ParseFromIstream(&input);  //Парсим из файла
-	//flist.PrintDebugString(); // Вывод файла
+	std::ifstream input("filelist.pb", std::ofstream::binary); // РћС‚РєСЂС‹РІР°РµРј РЅР°С€ Р·Р°РїРёСЃР°РЅРЅС‹Р№ С„Р°Р№Р»
+	flist.ParseFromIstream(&input);  //РџР°СЂСЃРёРј РёР· С„Р°Р№Р»Р°
+	//flist.PrintDebugString(); // Р’С‹РІРѕРґ С„Р°Р№Р»Р°
 	input.close();
 }
 
-//выводит список файлов и папок в директории
+//РІС‹РІРѕРґРёС‚ СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ Рё РїР°РїРѕРє РІ РґРёСЂРµРєС‚РѕСЂРёРё
 void get_dir_list(fs::directory_iterator iterator, std::vector<Fileinfo> & vec_finfo, Fileinfo & finfo, std::ifstream & ifs) {
 	for (; iterator != fs::directory_iterator(); ++iterator)
 	{
 		if (fs::is_directory(iterator->status())) {
-			//если наткнулись на папку, то рекурсивно запускаем эту же функцию для этой папки
+			//РµСЃР»Рё РЅР°С‚РєРЅСѓР»РёСЃСЊ РЅР° РїР°РїРєСѓ, С‚Рѕ СЂРµРєСѓСЂСЃРёРІРЅРѕ Р·Р°РїСѓСЃРєР°РµРј СЌС‚Сѓ Р¶Рµ С„СѓРЅРєС†РёСЋ РґР»СЏ СЌС‚РѕР№ РїР°РїРєРё
 			fs::directory_iterator sub_dir(iterator->path());
 			get_dir_list(sub_dir, vec_finfo, finfo, ifs);
 
 		}
 		else
-			//а если нет, то записываем в структуру имя, размер, хеш, и флажок (понадобится чуть позже, когда будем искать изменения в файлах)
+			//Р° РµСЃР»Рё РЅРµС‚, С‚Рѕ Р·Р°РїРёСЃС‹РІР°РµРј РІ СЃС‚СЂСѓРєС‚СѓСЂСѓ РёРјСЏ, СЂР°Р·РјРµСЂ, С…РµС€, Рё С„Р»Р°Р¶РѕРє (РїРѕРЅР°РґРѕР±РёС‚СЃСЏ С‡СѓС‚СЊ РїРѕР·Р¶Рµ, РєРѕРіРґР° Р±СѓРґРµРј РёСЃРєР°С‚СЊ РёР·РјРµРЅРµРЅРёСЏ РІ С„Р°Р№Р»Р°С…)
 		{
 
 			finfo.path = iterator->path().string();
-			//исправляем косяк с \ перед файлом в пути, так работает filesystem :-(
+			//РёСЃРїСЂР°РІР»СЏРµРј РєРѕСЃСЏРє СЃ \ РїРµСЂРµРґ С„Р°Р№Р»РѕРј РІ РїСѓС‚Рё, С‚Р°Рє СЂР°Р±РѕС‚Р°РµС‚ filesystem :-(
 			std::replace(finfo.path.begin(), finfo.path.end(), '\\', '/');
 			finfo.size = fs::file_size(iterator->path());
 			ifs.open(finfo.path, std::ios_base::binary);
@@ -111,24 +111,24 @@ void get_dir_list(fs::directory_iterator iterator, std::vector<Fileinfo> & vec_f
 int main() {
 	std::ofstream myfile;
 	std::string path, dirpath;
-	//объявление структуры, в которую будем записывать данные и складывать их в вектор
+	//РѕР±СЉСЏРІР»РµРЅРёРµ СЃС‚СЂСѓРєС‚СѓСЂС‹, РІ РєРѕС‚РѕСЂСѓСЋ Р±СѓРґРµРј Р·Р°РїРёСЃС‹РІР°С‚СЊ РґР°РЅРЅС‹Рµ Рё СЃРєР»Р°РґС‹РІР°С‚СЊ РёС… РІ РІРµРєС‚РѕСЂ
 	Fileinfo finfo;
-	//Инпут, через который мы считаем хеш
+	//РРЅРїСѓС‚, С‡РµСЂРµР· РєРѕС‚РѕСЂС‹Р№ РјС‹ СЃС‡РёС‚Р°РµРј С…РµС€
 	std::ifstream ifs;
 	std::cout << "Folder path:" << std::endl;
 	std::getline(std::cin, path);
-	// Кстати, путь можно скопировать и вставлять через меню, кликая по иконке запускаемого приложения в левом верхнем углу.
-	// Клик левой кнопкой по иконке - изменить - вставить.
-	//Вектор, в который мы будет складывать объекты нашей структуры
+	// РљСЃС‚Р°С‚Рё, РїСѓС‚СЊ РјРѕР¶РЅРѕ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ Рё РІСЃС‚Р°РІР»СЏС‚СЊ С‡РµСЂРµР· РјРµРЅСЋ, РєР»РёРєР°СЏ РїРѕ РёРєРѕРЅРєРµ Р·Р°РїСѓСЃРєР°РµРјРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ РІ Р»РµРІРѕРј РІРµСЂС…РЅРµРј СѓРіР»Сѓ.
+	// РљР»РёРє Р»РµРІРѕР№ РєРЅРѕРїРєРѕР№ РїРѕ РёРєРѕРЅРєРµ - РёР·РјРµРЅРёС‚СЊ - РІСЃС‚Р°РІРёС‚СЊ.
+	//Р’РµРєС‚РѕСЂ, РІ РєРѕС‚РѕСЂС‹Р№ РјС‹ Р±СѓРґРµС‚ СЃРєР»Р°РґС‹РІР°С‚СЊ РѕР±СЉРµРєС‚С‹ РЅР°С€РµР№ СЃС‚СЂСѓРєС‚СѓСЂС‹
 	std::vector<Fileinfo> vec_finfo;
-	//Вектор, в который мы будем считывать из файла, чтобы сравнить две дерева файлов
+	//Р’РµРєС‚РѕСЂ, РІ РєРѕС‚РѕСЂС‹Р№ РјС‹ Р±СѓРґРµРј СЃС‡РёС‚С‹РІР°С‚СЊ РёР· С„Р°Р№Р»Р°, С‡С‚РѕР±С‹ СЃСЂР°РІРЅРёС‚СЊ РґРІРµ РґРµСЂРµРІР° С„Р°Р№Р»РѕРІ
 	std::vector<Fileinfo> vec_finfo_old;
-	//Итератор, который будет бегать по папкам и файлам
+	//РС‚РµСЂР°С‚РѕСЂ, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ Р±РµРіР°С‚СЊ РїРѕ РїР°РїРєР°Рј Рё С„Р°Р№Р»Р°Рј
 	fs::directory_iterator home_dir(path);
-	//Запуск функции, которая запишем в вектор все файлы
+	//Р—Р°РїСѓСЃРє С„СѓРЅРєС†РёРё, РєРѕС‚РѕСЂР°СЏ Р·Р°РїРёС€РµРј РІ РІРµРєС‚РѕСЂ РІСЃРµ С„Р°Р№Р»С‹
 	get_dir_list(home_dir, vec_finfo, finfo, ifs);
 
-	//Выводим список файлов, размеров и т.д. из вектора. Просто для дебага.
+	//Р’С‹РІРѕРґРёРј СЃРїРёСЃРѕРє С„Р°Р№Р»РѕРІ, СЂР°Р·РјРµСЂРѕРІ Рё С‚.Рґ. РёР· РІРµРєС‚РѕСЂР°. РџСЂРѕСЃС‚Рѕ РґР»СЏ РґРµР±Р°РіР°.
 	/*
 	for (Fileinfo element : vec_finfo) {
 	std::cout << element.path << std::endl <<
@@ -137,9 +137,9 @@ int main() {
 	element.flag << std::endl;
 	}
 	*/
-	//сохраняем полученное в хмл файле с именем example.xml, создастся он в папке где находится main.cpp
+	//СЃРѕС…СЂР°РЅСЏРµРј РїРѕР»СѓС‡РµРЅРЅРѕРµ РІ С…РјР» С„Р°Р№Р»Рµ СЃ РёРјРµРЅРµРј example.xml, СЃРѕР·РґР°СЃС‚СЃСЏ РѕРЅ РІ РїР°РїРєРµ РіРґРµ РЅР°С…РѕРґРёС‚СЃСЏ main.cpp
 	savepbuf("filelist.pb", vec_finfo);
-	//loadpbuf("example.xml", vec_finfo_old);  //загрузка файла
+	//loadpbuf("example.xml", vec_finfo_old);  //Р·Р°РіСЂСѓР·РєР° С„Р°Р№Р»Р°
 	std::cin.clear();
 	fflush(stdin);
 	std::cin.get();
