@@ -45,11 +45,40 @@ struct Fileinfo {
 	std::string path;
 	std::string hash;
 	int size;
-	std::string flag;
+	std::string flag = "NEW";
 };
 
+//Сравниваем старый и новый список файлов
+std::vector<Fileinfo> compare_lists(std::vector<Fileinfo> newfl, std::vector<Fileinfo> oldfl) {
+	for (std::vector<Fileinfo>::iterator itnew = newfl.begin(); itnew < newfl.end(); itnew++) {
+		/*Бегаем по вектору:
+		//Если нашли путь и хеш совпал, то меняем флаг на UNCHANGED
+		//Если нашли путь и хеш не совпал, то меняем флаг на CHANGED
+		//В новом файле у всех флагов у всех структур стоит флаг NEW - если не нашли в старом, то его и оставляем
+		//Всё что осталось в старом - DELETED, добавляем в newfl и возвращаем его же
+		*/
+		for (std::vector<Fileinfo>::iterator itold = oldfl.begin(); itold < oldfl.end(); itold++) {
+			if ((itnew->path == itold->path) && (itnew->hash == itold->hash)) {
+				itnew->flag = "UNCHANGED";
+				oldfl.erase(itold);
+				break;
+			}
+			if ((itnew->path == itold->path) && (itnew->hash != itold->hash)) {
+				itnew->flag = "CHANGED";
+				oldfl.erase(itold);
+				break;
+			}
+		}
+	}
+	for (std::vector<Fileinfo>::iterator itold = oldfl.begin(); itold < oldfl.end(); itold++) {
+		itold->flag = "DELETED";
+		newfl.push_back(*itold);
+	}
+	return newfl;
+}
+
 //Записываем через протобаф. Filelist - внешняя структура, в которую кладем элементы Filep
-void savepbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
+void savepbuf(std::string filename, std::vector<Fileinfo> & vec_finfo) {
 	nsofdir::ArrFilep flist;
 	nsofdir::Filep * file_entry;
 	std::ofstream output(filename, std::ofstream::binary);
@@ -58,7 +87,7 @@ void savepbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
 		file_entry = flist.add_filep();
 		file_entry->set_filepath(it.path);
 		file_entry->set_size(it.size);
-		file_entry->set_mdsixhash(it.hash); // добавить позже
+		file_entry->set_mdsixhash(it.hash);
 
 	}
 	//Вывод файла
@@ -69,13 +98,26 @@ void savepbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
 }
 
 //Загрузка записанного файла (записывает в файл, но пока не засовывает в вектор - доделать позже
-void loadpbuf(std::string filename, std::vector<Fileinfo> vec_finfo) {
-	nsofdir::ArrFilep flist;  //Filelist, в который считаем файл
-	nsofdir::Filep * file_entry;
-	std::ifstream input("filelist.pb", std::ofstream::binary); // Открываем наш записанный файл
-	flist.ParseFromIstream(&input);  //Парсим из файла
-	//flist.PrintDebugString(); // Вывод файла
+void loadpbuf(std::string filename, std::vector<Fileinfo> & vec_finfo) {
+	//вспомогательная структура Fileinfo, через которую заполним вектор
+	Fileinfo it;
+	//Filelist, в который считаем файл
+	nsofdir::ArrFilep flist;  
+	nsofdir::Filep file_entry;
+	// Открываем наш записанный файл
+	std::ifstream input(filename, std::ofstream::binary); 
+	//Парсим из файла
+	flist.ParseFromIstream(&input);  
 	input.close();
+	//flist.PrintDebugString(); // Вывод файла
+	file_entry.PrintDebugString();
+	for (int i = 0; i < flist.filep_size(); i++) {
+		file_entry = flist.filep(i);
+		it.path = file_entry.filepath();
+		it.size = file_entry.size();
+		it.hash = file_entry.mdsixhash();
+		vec_finfo.push_back(it);
+	}
 }
 
 //выводит список файлов и папок в директории
@@ -101,10 +143,18 @@ void get_dir_list(fs::directory_iterator iterator, std::vector<Fileinfo> & vec_f
 				(std::istreambuf_iterator<char>()));
 			finfo.hash = md6(strifs);
 			ifs.close();
-			finfo.flag = 'R';
 			vec_finfo.push_back(finfo);
 		}
 
+	}
+}
+
+void print_finfo_vec(std::vector<Fileinfo> vec) {
+	for (Fileinfo element : vec) {
+		std::cout << element.path << std::endl <<
+			element.size << std::endl <<
+			element.hash << std::endl <<
+			element.flag << std::endl << "-------" << std::endl;
 	}
 }
 
@@ -115,6 +165,13 @@ int main() {
 	Fileinfo finfo;
 	//Инпут, через который мы считаем хеш
 	std::ifstream ifs;
+	std::string checkstatus;
+	std::cout << "Do you wish to save filelist or check current folder with previous result?" << 
+		std::endl << "(check/save or anything else for neither)" << std::endl;
+	std::cin >> checkstatus;
+	std::cin.clear();
+	fflush(stdin);
+	
 	std::cout << "Folder path:" << std::endl;
 	std::getline(std::cin, path);
 	// Кстати, путь можно скопировать и вставлять через меню, кликая по иконке запускаемого приложения в левом верхнем углу.
@@ -127,19 +184,19 @@ int main() {
 	fs::directory_iterator home_dir(path);
 	//Запуск функции, которая запишем в вектор все файлы
 	get_dir_list(home_dir, vec_finfo, finfo, ifs);
-
-	//Выводим список файлов, размеров и т.д. из вектора. Просто для дебага.
-	/*
-	for (Fileinfo element : vec_finfo) {
-	std::cout << element.path << std::endl <<
-	element.size << std::endl <<
-	element.hash << std::endl <<
-	element.flag << std::endl;
+	if (checkstatus == "save") {
+		savepbuf("filelist.pb", vec_finfo);
+		print_finfo_vec(vec_finfo);
 	}
-	*/
-	//сохраняем полученное в хмл файле с именем example.xml, создастся он в папке где находится main.cpp
-	savepbuf("filelist.pb", vec_finfo);
-	//loadpbuf("example.xml", vec_finfo_old);  //загрузка файла
+	if (checkstatus == "check") {
+		loadpbuf("filelist.pb", vec_finfo_old);  //загрузка файла
+		//Выводим список файлов, размеров и т.д. из вектора. Просто для дебага.
+		//сравнение нового и старого
+		print_finfo_vec(compare_lists(vec_finfo, vec_finfo_old));
+	}
+	if ((checkstatus != "save") && (checkstatus != "check")) {
+		print_finfo_vec(vec_finfo);
+	}
 	std::cin.clear();
 	fflush(stdin);
 	std::cin.get();
