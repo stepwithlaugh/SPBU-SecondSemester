@@ -187,6 +187,7 @@ int main() {
 	}
 	catch (const boost::filesystem::filesystem_error& e) {
 		std::cout << "INVALID PATH" << std::endl;
+		checkstatus = "null";
 	}
 	//Запуск функции, которая запишем в вектор все файлы
 	if (checkstatus == "save") {
