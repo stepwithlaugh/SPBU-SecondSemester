@@ -181,9 +181,14 @@ int main() {
 	//Вектор, в который мы будем считывать из файла, чтобы сравнить две дерева файлов
 	std::vector<Fileinfo> vec_finfo_old;
 	//Итератор, который будет бегать по папкам и файлам
-	fs::directory_iterator home_dir(path);
+	try {
+		fs::directory_iterator home_dir(path);
+		get_dir_list(home_dir, vec_finfo, finfo, ifs);
+	}
+	catch (const boost::filesystem::filesystem_error& e) {
+		std::cout << "INVALID PATH" << std::endl;
+	}
 	//Запуск функции, которая запишем в вектор все файлы
-	get_dir_list(home_dir, vec_finfo, finfo, ifs);
 	if (checkstatus == "save") {
 		savepbuf("filelist.pb", vec_finfo);
 		print_finfo_vec(vec_finfo);
