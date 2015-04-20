@@ -168,13 +168,9 @@ int main() {
 	std::string checkstatus;
 	std::cout << "Do you wish to save filelist or check current folder with previous result?" << 
 		std::endl << "(check/save or anything else for neither)" << std::endl;
-	std::cin >> checkstatus;
-	std::cin.clear();
-	fflush(stdin);
+	std::getline(std::cin, checkstatus);
 	
 	std::cout << "Folder path:" << std::endl;
-	std::cin.clear();
-	fflush(stdin);
 	std::getline(std::cin, path);
 
 	// Кстати, путь можно скопировать и вставлять через меню, кликая по иконке запускаемого приложения в левом верхнем углу.
@@ -206,8 +202,6 @@ int main() {
 	if ((checkstatus != "save") && (checkstatus != "check")) {
 		print_finfo_vec(vec_finfo);
 	}
-	std::cin.clear();
-	fflush(stdin);
 	std::cin.get();
 	return 0;
 }
