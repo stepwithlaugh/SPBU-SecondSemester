@@ -36,6 +36,9 @@ libstdc++-6.dll
 #include <boost/filesystem.hpp>  //BOOST::FILESYSTEM с помощью которого считываем директорию
 #include "pbfile.pb.h" //файл, который сделал protoc
 #include "md6/md6.h"
+#include "tinyxml/tinyxml.h"
+#include "tinyxml/tinyxmlerror.cpp"
+#include "tinyxml/tinyxmlparser.cpp"
 
 namespace fs = boost::filesystem;
 std::string test;
@@ -67,6 +70,39 @@ struct Fileinfo {
 	int size;
 	std::string flag = "NEW";
 };
+
+void save2xml(string filename, vector<Fileinfo> vec_finfo) {
+	TiXmlDocument doc;
+	TiXmlDeclaration * decl = new TiXmlDeclaration("1.0", "", "");
+	doc.LinkEndChild(decl);
+	for (Fileinfo it : vec_finfo) {
+		TiXmlElement * element = new TiXmlElement("File");
+		doc.LinkEndChild(element);
+		element->SetAttribute("path", it.path.c_str());
+		element->SetAttribute("size", it.size);
+		element->SetAttribute("hash", it.hash.c_str());
+		//element->SetAttribute("flag", it.flag);
+		TiXmlText * text = new TiXmlText("");
+		element->LinkEndChild(text);
+	}
+	doc.SaveFile(filename.c_str());
+}
+
+void loadxml(string filename, vector<Fileinfo> & vec_finfo) {
+	Fileinfo it;
+	TiXmlDocument doc;
+	doc.LoadFile(filename.c_str());
+	TiXmlHandle docHandle(&doc);
+	TiXmlElement* child = docHandle.FirstChild("File").ToElement();
+	for (child; child; child = child->NextSiblingElement())
+	{
+
+		it.size = atoi(child->Attribute("size"));
+		it.hash = child->Attribute("hash");
+		it.path = child->Attribute("path");
+		vec_finfo.push_back(it);
+	}
+}
 
 //Сравниваем старый и новый список файлов
 std::vector<Fileinfo> compare_lists(std::vector<Fileinfo> newfl, std::vector<Fileinfo> oldfl) {
@@ -190,7 +226,8 @@ int main() {
 	std::ifstream ifs;
 	std::string checkstatus;
 	std::cout << "Do you wish to save filelist or check current folder with previous result?" << 
-		std::endl << "(check/save or anything else for neither)" << std::endl;
+		std::endl << "(check/save or anything else for neither)" 
+		<< "checkxml/savexml for xml option" << std::endl;
 	std::cin >> checkstatus;
 	std::cin.clear();
 	fflush(stdin);
@@ -225,6 +262,14 @@ int main() {
 	}
 	if ((checkstatus != "save") && (checkstatus != "check")) {
 		print_finfo_vec(vec_finfo);
+	}
+		if (checkstatus == "savexml") {
+		save2xml("example.xml", vec_finfo);
+		print_finfo_vec(vec_finfo);
+	}
+	if (checkstatus == "checkxml") {
+		loadxml("example.xml", vec_finfo_old);
+		print_finfo_vec(compare_lists(vec_finfo, vec_finfo_old));
 	}
 	std::cin.clear();
 	fflush(stdin);
